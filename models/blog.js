@@ -3,13 +3,22 @@ const mongoose = require('mongoose')
 const blogSchema = mongoose.Schema({
   title: {
     type: String,
-    require: true,
-    min: 3
+    required: true,
+    minLength: [3, 'must be at lest 3 -- {VALUE}']
   },
   author: {
     type: String,
-    require: true,
-    min: 3
+    required: true,
+    minLength: [3, 'must be at lest 3 -- {VALUE}']
+  },
+  blogText: {
+    type: String,
+    validate: {
+      validator: (value) => typeof value === 'string',
+      message: '{VALUE} is not a valid string.'
+    },
+    required: true,
+    minLength: [10, 'must be at lest 10 -- {VALUE}']
   }
 
 })
