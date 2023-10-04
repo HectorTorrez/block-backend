@@ -11,3 +11,18 @@ Content-Type: application/json
     "author": "hector",
     "blogText": 1
 }
+
+
+###
+PATCH  http://localhost:3003/api/blogs/651b6a353500fc8c9bf97783
+Content-Type: application/json
+
+{
+    "title": "eat more ",
+    "author": "hector",
+    "blogText": "please eat more"
+}
+
+
+###
+DELETE  http://localhost:3003/api/blogs/651b6a64e2816089baeaed19
