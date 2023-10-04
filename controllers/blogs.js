@@ -26,7 +26,7 @@ blogsRouter.post('/', async (request, response) => {
   } catch (error) {
     console.log(error.message)
     if (error.name === 'ValidationError') {
-      response.status(404).json(error.message)
+      response.status(400).json(error.message)
     }
     console.log(error)
   }
@@ -45,7 +45,7 @@ blogsRouter.patch('/:id', async (request, response) => {
     response.json(foundBlog).status(200)
   } catch (error) {
     console.log(error)
-    response.status(404).json(error)
+    response.status(400).json(error)
   }
 })
 
@@ -56,7 +56,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     response.status(204).end()
   } catch (error) {
     console.log(error)
-    response.status(404).json(error)
+    response.status(400).json(error)
   }
 })
 
