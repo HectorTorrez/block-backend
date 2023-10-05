@@ -19,7 +19,13 @@ const blogSchema = mongoose.Schema({
     },
     required: true,
     minLength: [10, 'must be at lest 10 -- {VALUE}']
-  }
+  },
+  user: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User'
+    }
+  ]
 
 })
 
