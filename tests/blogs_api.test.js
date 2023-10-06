@@ -3,6 +3,7 @@ const app = require('../app.js')
 const api = supertest(app)
 const Blog = require('../models/blog')
 const helper = require('./blogs-helper.js')
+const mongoose = require('mongoose')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -147,4 +148,8 @@ describe('DELETE/ blog', () => {
 
     expect(result.body.message).toContain(`Cast to ObjectId failed for value "${id}" (type string) at path "_id" for model "Blog"`)
   })
+})
+
+afterAll(async () => {
+  await mongoose.connection.close()
 })
