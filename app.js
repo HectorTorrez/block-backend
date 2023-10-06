@@ -6,7 +6,6 @@ const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 
 connectDB()
-
 app.use(cors())
 app.use(express.json())
 
