@@ -22,7 +22,7 @@ usersRouter.post('/', async (request, response) => {
     response.status(201).json(savedUser)
   } catch (error) {
     console.log(error)
-    response.status(400).json(error)
+    response.status(400).json(error.message)
   }
 })
 
