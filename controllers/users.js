@@ -25,4 +25,34 @@ usersRouter.post('/', async (request, response) => {
   }
 })
 
+usersRouter.patch('/:id', async (request, response) => {
+  try {
+    const id = request.params.id
+    const { name, username, password } = request.body
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(password, saltRounds)
+
+    const userToUpdated = {
+      name,
+      username,
+      passwordHash
+    }
+    const user = await User.findByIdAndUpdate(id, userToUpdated, { new: true })
+    response.json(user).status(200)
+  } catch (error) {
+    response.status(400).json(error.message)
+  }
+})
+
+usersRouter.delete('/:id', async (request, response) => {
+  try {
+    const id = request.params.id
+    await User.findByIdAndDelete(id)
+    response.status(204).end()
+  } catch (error) {
+    console.log(error.message)
+    response.status(400).json(error.message)
+  }
+})
+
 module.exports = usersRouter
