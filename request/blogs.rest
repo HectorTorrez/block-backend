@@ -20,7 +20,8 @@ Content-Type: application/json
 {
     "title": "eat",
     "author": "hector",
-    "blogText": 1
+    "blogText": "please, eat something good",
+    "userId": "651e1347822860e25886b4ee"
 }
 
 
@@ -36,4 +37,4 @@ Content-Type: application/json
 
 
 ###
-DELETE  http://localhost:3003/api/blogs/651b6a64e2816089baeaed19
+DELETE  http://localhost:3003/api/blogs/65244fc1d69c324142d2b024
