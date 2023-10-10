@@ -28,10 +28,13 @@ describe('GET/ get blogs', () => {
 describe('Post/ blog creation', () => {
   test('blog must be created', async () => {
     const blogsAtStart = await helper.blogsInDB()
+    const user = await helper.usersInBD()
+    const userToCreatedBLog = user[0]
     const newBlog = {
       title: 'drink a lot of water',
       author: 'hector',
-      blogText: "It's necesary drink a lot of water to be happy"
+      blogText: "It's necesary drink a lot of water to be happy",
+      userId: userToCreatedBLog.id
     }
     await api
       .post('/api/blogs')
@@ -46,8 +49,11 @@ describe('Post/ blog creation', () => {
 
   test('blog must be not created, if title and blogText are mising', async () => {
     const blogsAtStart = await helper.blogsInDB()
+    const user = await helper.usersInBD()
+    const userToCreatedBLog = user[0]
     const newBlog = {
-      author: 'hector'
+      author: 'hector',
+      userId: userToCreatedBLog.id
     }
     await api
       .post('/api/blogs')
@@ -60,11 +66,13 @@ describe('Post/ blog creation', () => {
 
   test('blog must be not created, if title and author dont have the min of length', async () => {
     const blogsAtStart = await helper.blogsInDB()
-
+    const user = await helper.usersInBD()
+    const userToCreatedBLog = user[0]
     const newBlog = {
       title: 'an',
       author: 'a',
-      blogText: 'water and more water'
+      blogText: 'water and more water',
+      userId: userToCreatedBLog.id
     }
 
     const result = await api
@@ -79,11 +87,13 @@ describe('Post/ blog creation', () => {
 
   test('blog must be no created, if blogText dont have the min of length', async () => {
     const blogsAtStart = await helper.blogsInDB()
-
+    const user = await helper.usersInBD()
+    const userToCreatedBLog = user[0]
     const newBlog = {
       title: 'water',
       author: 'antonio',
-      blogText: 'water '
+      blogText: 'water ',
+      userId: userToCreatedBLog.id
     }
 
     const result = await api
