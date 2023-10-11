@@ -3,6 +3,17 @@ get http://localhost:3003/api/blogs
 
 ###
 get http://localhost:3003/api/users
+
+#####
+post http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+    "username": "hector",
+    "password": "1234"
+}
+
+
 ####
 post http://localhost:3003/api/users
 Content-Type: application/json
@@ -16,6 +27,7 @@ Content-Type: application/json
 #####
 post http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlY3RvciIsImlkIjoiNjUxZTEzNDc4MjI4NjBlMjU4ODZiNGVlIiwiaWF0IjoxNjk2OTg1MDYyfQ.r-_4mNFTdzxUSqJLA1r62LZt55NgMsHeehhoYK5BfNg
 
 {
     "title": "eat",
@@ -37,4 +49,4 @@ Content-Type: application/json
 
 
 ###
-DELETE  http://localhost:3003/api/blogs/65244fc1d69c324142d2b024
+DELETE  http://localhost:3003/api/blogs/651e1347822860e25886b4ee
