@@ -4,10 +4,21 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const helper = require('./blogs-helper.js')
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user.js')
+const bcrypt = require('bcrypt')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(helper.INITIAL_STATE)
+})
+beforeEach(async () => {
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('antonio', 10)
+  const user = new User({ username: 'hector00', name: 'hector', passwordHash })
+
+  await user.save()
 })
 
 describe('GET/ get blogs', () => {
@@ -28,17 +39,24 @@ describe('GET/ get blogs', () => {
 describe('Post/ blog creation', () => {
   test('blog must be created', async () => {
     const blogsAtStart = await helper.blogsInDB()
-    const user = await helper.usersInBD()
-    const userToCreatedBLog = user[0]
+
+    const usersAtStart = await helper.usersInBD()
+    const userToLogin = usersAtStart[0]
+    const userForAuth = { username: userToLogin.username, id: userToLogin.id }
+    const token = jwt.sign(userForAuth, process.env.SECRET)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
+
     const newBlog = {
       title: 'drink a lot of water',
       author: 'hector',
       blogText: "It's necesary drink a lot of water to be happy",
-      userId: userToCreatedBLog.id
+      user: user.id
     }
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `bearer ${token}`)
       .expect(201)
 
     const blogsAtEnd = await helper.blogsInDB()
@@ -49,15 +67,20 @@ describe('Post/ blog creation', () => {
 
   test('blog must be not created, if title and blogText are mising', async () => {
     const blogsAtStart = await helper.blogsInDB()
-    const user = await helper.usersInBD()
-    const userToCreatedBLog = user[0]
+    const usersAtStart = await helper.usersInBD()
+    const userToLogin = usersAtStart[0]
+    const userForAuth = { username: userToLogin.username, id: userToLogin.id }
+    const token = jwt.sign(userForAuth, process.env.SECRET)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
     const newBlog = {
       author: 'hector',
-      userId: userToCreatedBLog.id
+      userId: user.id
     }
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `bearer ${token}`)
       .expect(400)
 
     const blogsAtEnd = await helper.blogsInDB()
@@ -66,18 +89,23 @@ describe('Post/ blog creation', () => {
 
   test('blog must be not created, if title and author dont have the min of length', async () => {
     const blogsAtStart = await helper.blogsInDB()
-    const user = await helper.usersInBD()
-    const userToCreatedBLog = user[0]
+    const usersAtStart = await helper.usersInBD()
+    const userToLogin = usersAtStart[0]
+    const userForAuth = { username: userToLogin.username, id: userToLogin.id }
+    const token = jwt.sign(userForAuth, process.env.SECRET)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
     const newBlog = {
       title: 'an',
       author: 'a',
       blogText: 'water and more water',
-      userId: userToCreatedBLog.id
+      userId: user.id
     }
 
     const result = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `bearer ${token}`)
       .expect(400)
 
     const blogsAtEnd = await helper.blogsInDB()
@@ -87,23 +115,48 @@ describe('Post/ blog creation', () => {
 
   test('blog must be no created, if blogText dont have the min of length', async () => {
     const blogsAtStart = await helper.blogsInDB()
-    const user = await helper.usersInBD()
-    const userToCreatedBLog = user[0]
+    const usersAtStart = await helper.usersInBD()
+    const userToLogin = usersAtStart[0]
+    const userForAuth = { username: userToLogin.username, id: userToLogin.id }
+    const token = jwt.sign(userForAuth, process.env.SECRET)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
     const newBlog = {
       title: 'water',
       author: 'antonio',
       blogText: 'water ',
-      userId: userToCreatedBLog.id
+      userId: user.id
     }
 
     const result = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `bearer ${token}`)
       .expect(400)
 
     const blogsAtEnd = await helper.blogsInDB()
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
     expect(result.body).toContain(`Blog validation failed: blogText: must be at lest 10 -- ${newBlog.blogText}`)
+  })
+
+  test('blog must bet not created if dont have token', async () => {
+    const blogsAtStart = await helper.blogsInDB()
+    const usersAtStart = await helper.usersInBD()
+    const userToCreate = usersAtStart[0]
+
+    const newBlog = {
+      title: 'drink a lot of water',
+      author: 'hector',
+      blogText: "It's necesary drink a lot of water to be happy",
+      user: userToCreate.id
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+
+    const blogsAtEnd = await helper.blogsInDB()
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
   })
 })
 
