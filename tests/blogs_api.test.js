@@ -28,6 +28,14 @@ describe('GET/ get blogs', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
+  test('must get one blog', async () => {
+    const blogsAtStart = await helper.blogsInDB()
+    const blogToGet = blogsAtStart[0]
+    await api
+      .get(`/api/blogs/${blogToGet.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
 
   test('must be error wron endpoint', async () => {
     await api

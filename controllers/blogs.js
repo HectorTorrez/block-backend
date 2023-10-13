@@ -13,6 +13,16 @@ blogsRouter.get('/', async (request, response) => {
   }
 })
 
+blogsRouter.get('/:id', async (request, response) => {
+  const id = request.params.id
+  const blog = await Blog.findById(id)
+  if (blog) {
+    response.json(blog)
+  } else {
+    response.status(404).json({ message: 'blog not found' })
+  }
+})
+
 blogsRouter.post('/', async (request, response) => {
   const { title, author, blogText } = request.body
   const token = request.token
