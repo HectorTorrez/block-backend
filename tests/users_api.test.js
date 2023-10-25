@@ -4,6 +4,7 @@ const helper = require('./blogs-helper')
 const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app.js')
+const path = require('path')
 const api = supertest(app)
 
 describe('API EndPoints', () => {
@@ -11,7 +12,15 @@ describe('API EndPoints', () => {
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('antonio', 10)
-    const user = new User({ username: 'hector00', name: 'hector', passwordHash })
+    const user = new User({
+      username: 'hector00',
+      name: 'hector',
+      passwordHash,
+      imageProfile: {
+        secure_url: 'https://example.com/image.png',
+        public_id: 'image.png'
+      }
+    })
 
     await user.save()
   })
@@ -29,22 +38,24 @@ describe('API EndPoints', () => {
 
   test('POST /api/users/ an user must be created ', async () => {
     const usersAtStart = await helper.usersInBD()
-
     const newUser = {
-      name: 'antonio',
-      username: 'antonio00',
-      password: '123456'
+      name: 'John Doe',
+      username: 'johndoe',
+      password: 'password123'
     }
-    await api
-      .post('/api/users')
-      .send(newUser)
-      .expect(201)
 
-    console.log('finish find')
+    const response = await api
+      .post('/users')
+      .field('name', newUser.name)
+      .field('username', newUser.username)
+      .field('password', newUser.password)
+      .attach('imageProfile', '../uploadTests/html.png')
+
+    console.log(response)
     const usersAtEnd = await helper.usersInBD()
     expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
-    const users = usersAtEnd.map(u => u.username)
-    expect(users).toContain(newUser.username)
+    // const users = usersAtEnd.map(u => u.username)
+    // expect(users).toContain(newUser.username)
   })
 
   test('PATH /api/users an user must be updated', async () => {

@@ -200,7 +200,6 @@ describe('DELETE/ blog', () => {
   test('blog must be deleted', async () => {
     const blogsAtStart = await helper.blogsInDB()
     const blogToDelete = blogsAtStart[0]
-
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
       .expect(204)
