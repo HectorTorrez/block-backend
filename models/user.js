@@ -5,19 +5,39 @@ const userSchema = mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    minLength: [5, 'must be at lest 3 -- {VALUE}']
   },
   name: {
     type: String,
-    required: true
+    required: true,
+    minLength: [5, 'must be at lest 3 -- {VALUE}']
+
   },
-  passwordHash: String,
+  passwordHash: {
+    type: String,
+    required: true,
+    minLength: [5, 'must be at lest 3 -- {VALUE}']
+
+  },
   blogs: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Blog'
     }
-  ]
+
+  ],
+  imageProfile: {
+    type: Object,
+    properties: {
+      secure_url: {
+        type: String
+      },
+      public_id: {
+        type: String
+      }
+    }
+  }
 })
 
 userSchema.plugin(uniqueValidator)
