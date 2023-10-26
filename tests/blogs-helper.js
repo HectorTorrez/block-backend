@@ -1,13 +1,5 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const cloudinary = require('cloudinary')
-const { CLOUD_NAME, API_KEY, API_SECRET } = require('../utils/config')
-
-cloudinary.config({
-  cloud_name: CLOUD_NAME,
-  api_key: API_KEY,
-  api_secret: API_SECRET
-})
 
 const INITIAL_STATE = [
   {
@@ -34,19 +26,17 @@ const usersInBD = async () => {
   return users.map(u => u.toJSON())
 }
 
-const uploadImage = async (filePath) => {
-  return await cloudinary.uploader.upload(filePath, {
-    folder: 'profilePictures'
-  })
-}
-const deleteImage = async (publicId) => {
-  return await cloudinary.uploader.destroy(publicId)
+const mockRequest = {
+  files: {
+    imageProfile: {
+      tempFilePath: '/path/to/temp/file'
+    }
+  }
 }
 
 module.exports = {
   blogsInDB,
   INITIAL_STATE,
   usersInBD,
-  uploadImage,
-  deleteImage
+  mockRequest
 }

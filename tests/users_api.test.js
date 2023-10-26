@@ -4,7 +4,6 @@ const helper = require('./blogs-helper')
 const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app.js')
-const path = require('path')
 const api = supertest(app)
 
 describe('API EndPoints', () => {
@@ -38,24 +37,27 @@ describe('API EndPoints', () => {
 
   test('POST /api/users/ an user must be created ', async () => {
     const usersAtStart = await helper.usersInBD()
+
+    const path = require('path')
+    const file = path.join(__dirname, '../uploadTests/html.png')
     const newUser = {
       name: 'John Doe',
       username: 'johndoe',
       password: 'password123'
     }
 
-    const response = await api
-      .post('/users')
+    await api
+      .post('/api/users')
       .field('name', newUser.name)
       .field('username', newUser.username)
       .field('password', newUser.password)
-      .attach('imageProfile', '../uploadTests/html.png')
+      .attach('imageProfile', file)
+      .expect(201)
 
-    console.log(response)
     const usersAtEnd = await helper.usersInBD()
     expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
-    // const users = usersAtEnd.map(u => u.username)
-    // expect(users).toContain(newUser.username)
+    const users = usersAtEnd.map(u => u.username)
+    expect(users).toContain(newUser.username)
   })
 
   test('PATH /api/users an user must be updated', async () => {
