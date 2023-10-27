@@ -19,26 +19,27 @@ usersRouter.post('/', async (request, response) => {
       username,
       passwordHash
     })
-    let imageProfilePromise
+
+    const savedUser = await newUser.save()
+
     if (request.files) {
       const { imageProfile } = request.files
+
       const result = await uploadImage(imageProfile.tempFilePath)
-      newUser.imageProfile = {
+      savedUser.imageProfile = {
         secure_url: result.secure_url,
         public_id: result.public_id
       }
+      console.log(imageProfile.tempFilePath)
       await fs.unlink(imageProfile.tempFilePath)
-      imageProfilePromise = Promise.resolve()
-    } else {
-      imageProfilePromise = Promise.reject(new Error('imageProfile is required'))
+      await savedUser.save()
     }
 
-    const savedUserPromise = newUser.save()
-    await Promise.all([imageProfilePromise, savedUserPromise])
-    const savedUser = await savedUserPromise
     response.status(201).json(savedUser)
   } catch (error) {
-    console.log(error)
+    if (request.files.imageProfile.tempFilePath) {
+      await fs.unlink(request.files.imageProfile.tempFilePath)
+    }
     response.status(400).json(error.message)
   }
 })

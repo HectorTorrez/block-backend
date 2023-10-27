@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../app.js')
 const api = supertest(app)
+const path = require('path')
 
 describe('API EndPoints', () => {
   beforeEach(async () => {
@@ -38,7 +39,6 @@ describe('API EndPoints', () => {
   test('POST /api/users/ an user must be created ', async () => {
     const usersAtStart = await helper.usersInBD()
 
-    const path = require('path')
     const file = path.join(__dirname, '../uploadTests/html.png')
     const newUser = {
       name: 'John Doe',
