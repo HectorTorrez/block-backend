@@ -22,13 +22,13 @@ loginRouter.post('/', async (request, response) => {
       username: user.username,
       id: user.id
     }
-    const expiresIn = '5m'
+    const expiresIn = '1h'
     const jwtOptions = {
       expiresIn
     }
     const token = jwt.sign(userFortoken, process.env.SECRET, jwtOptions)
     console.log(token)
-    response.status(200).send({ token, username: user.username, name: user.name })
+    response.status(200).send({ token, username: user.username, name: user.name, imageProfile: user.imageProfile })
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
       return response.status(401).json(error.message)
