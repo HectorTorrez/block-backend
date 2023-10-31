@@ -2,7 +2,7 @@ const usersRouter = require('express').Router()
 const fs = require('fs/promises')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
-const { uploadImage } = require('../utils/cloudinary')
+const { uploadImage, deleteImage } = require('../utils/cloudinary')
 
 usersRouter.get('/', async (request, response) => {
   const users = await User.find({}).populate('blogs', { title: 1, author: 1, blogText: 1 })
@@ -30,9 +30,10 @@ usersRouter.post('/', async (request, response) => {
         secure_url: result.secure_url,
         public_id: result.public_id
       }
-      console.log(imageProfile.tempFilePath)
       await fs.unlink(imageProfile.tempFilePath)
       await savedUser.save()
+    } else {
+      response.status(400).json({ error: 'Image is required' })
     }
 
     response.status(201).json(savedUser)
@@ -47,6 +48,7 @@ usersRouter.post('/', async (request, response) => {
 usersRouter.patch('/:id', async (request, response) => {
   try {
     const id = request.params.id
+    console.log(id)
     const { name, username, password } = request.body
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
@@ -56,8 +58,28 @@ usersRouter.patch('/:id', async (request, response) => {
       username,
       passwordHash
     }
-    const user = await User.findByIdAndUpdate(id, userToUpdated, { new: true })
-    response.json(user).status(200)
+
+    const userFound = await User.findById(id)
+    console.log(request.files)
+
+    if (request.files) {
+      const { imageProfile } = request.files
+
+      if (userFound.imageProfile && userFound.imageProfile.public_id) {
+        await deleteImage(userFound.imageProfile.public_id)
+      }
+
+      const result = await uploadImage(imageProfile.tempFilePath)
+      userToUpdated.imageProfile = {
+        secure_url: result.secure_url,
+        public_id: result.public_id
+      }
+      await fs.unlink(imageProfile.tempFilePath)
+      const user = await User.findByIdAndUpdate(id, userToUpdated, { new: true })
+      return response.json(user).status(200)
+    } else {
+      return response.status(400).json({ error: 'Image is required' })
+    }
   } catch (error) {
     response.status(400).json(error.message)
   }
