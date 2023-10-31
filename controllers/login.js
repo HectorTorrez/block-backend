@@ -11,7 +11,6 @@ loginRouter.post('/', async (request, response) => {
     const passwordCorrect = user === null
       ? false
       : await bcrypt.compare(password, user.passwordHash)
-    console.log(passwordCorrect)
 
     if (!(user && passwordCorrect)) {
       return response.status(401).json({
@@ -27,8 +26,7 @@ loginRouter.post('/', async (request, response) => {
       expiresIn
     }
     const token = jwt.sign(userFortoken, process.env.SECRET, jwtOptions)
-    console.log(token)
-    response.status(200).send({ token, username: user.username, name: user.name, imageProfile: user.imageProfile })
+    response.status(200).send({ token, username: user.username, name: user.name, imageProfile: user.imageProfile, id: user.id })
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
       return response.status(401).json(error.message)
