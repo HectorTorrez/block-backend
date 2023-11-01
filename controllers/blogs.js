@@ -26,6 +26,7 @@ blogsRouter.get('/:id', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   const { title, author, blogText } = request.body
   const token = request.token
+
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET)
     if (!decodedToken.id) {
@@ -49,6 +50,9 @@ blogsRouter.post('/', async (request, response) => {
       response.status(400).json(error.message)
     }
     if (error.name === 'JsonWebTokenError') {
+      return response.status(401).json(error.message)
+    }
+    if (error.name === 'TokenExpiredError') {
       return response.status(401).json(error.message)
     }
 
