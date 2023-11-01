@@ -24,7 +24,7 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const { title, author, blogText, url } = request.body
+  const { title, author, blogText } = request.body
   const token = request.token
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET)
@@ -37,7 +37,6 @@ blogsRouter.post('/', async (request, response) => {
       title,
       author,
       blogText,
-      url,
       user: user._id
     })
     const blog = await newBlog.save()

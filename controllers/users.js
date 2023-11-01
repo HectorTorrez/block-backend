@@ -48,7 +48,6 @@ usersRouter.post('/', async (request, response) => {
 usersRouter.patch('/:id', async (request, response) => {
   try {
     const id = request.params.id
-    console.log(id)
     const { name, username, password } = request.body
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(password, saltRounds)
@@ -61,6 +60,11 @@ usersRouter.patch('/:id', async (request, response) => {
 
     const userFound = await User.findById(id)
     console.log(request.files)
+
+    if (request.files === null) {
+      const user = await User.findByIdAndUpdate(id, userToUpdated, { new: true })
+      return response.json(user).status(200)
+    }
 
     if (request.files) {
       const { imageProfile } = request.files
