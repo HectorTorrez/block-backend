@@ -22,6 +22,10 @@ usersRouter.post('/', async (request, response) => {
 
     const savedUser = await newUser.save()
 
+    if (request.files === null) {
+      return response.status(400).json({ error: 'Image is required' })
+    }
+
     if (request.files) {
       const { imageProfile } = request.files
 
@@ -32,8 +36,6 @@ usersRouter.post('/', async (request, response) => {
       }
       await fs.unlink(imageProfile.tempFilePath)
       await savedUser.save()
-    } else {
-      response.status(400).json({ error: 'Image is required' })
     }
 
     response.status(201).json(savedUser)

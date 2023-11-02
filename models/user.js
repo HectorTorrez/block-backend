@@ -6,18 +6,18 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    minLength: [5, 'must be at lest 3 -- {VALUE}']
+    minLength: [5, 'must be at lest 5 -- {VALUE}']
   },
   name: {
     type: String,
     required: true,
-    minLength: [5, 'must be at lest 3 -- {VALUE}']
+    minLength: [5, 'must be at lest 5 -- {VALUE}']
 
   },
   passwordHash: {
     type: String,
     required: true,
-    minLength: [5, 'must be at lest 3 -- {VALUE}']
+    minLength: [5, 'must be at lest 5 -- {VALUE}']
 
   },
   blogs: [
