@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
-loginRouter.post('/', async (request, response) => {
+loginRouter.post('/', async (request, response, next) => {
   try {
     const { username, password } = request.body
 
@@ -28,6 +28,7 @@ loginRouter.post('/', async (request, response) => {
     const token = jwt.sign(userFortoken, process.env.SECRET, jwtOptions)
     response.status(200).send({ token, username: user.username, name: user.name, imageProfile: user.imageProfile, id: user.id })
   } catch (error) {
+    next(error)
     if (error.name === 'JsonWebTokenError') {
       return response.status(401).json(error.message)
     }

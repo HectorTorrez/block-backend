@@ -5,8 +5,7 @@ const userSchema = mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
-    minLength: [5, 'must be at lest 5 -- {VALUE}']
+    unique: [true, 'username must be unique']
   },
   name: {
     type: String,
@@ -40,7 +39,7 @@ const userSchema = mongoose.Schema({
   }
 })
 
-userSchema.plugin(uniqueValidator)
+userSchema.plugin(uniqueValidator, { message: 'Error, expected {PATH} to be unique.' })
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {

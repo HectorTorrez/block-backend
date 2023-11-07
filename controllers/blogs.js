@@ -3,13 +3,13 @@ const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
-blogsRouter.get('/', async (request, response) => {
+blogsRouter.get('/', async (request, response, next) => {
   try {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs)
   } catch (error) {
-    console.log(error)
-    response.status(404).json(error)
+    next(error)
+    response.status(404).json({ error: error.message })
   }
 })
 
@@ -23,7 +23,7 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', async (request, response, next) => {
   const { title, author, blogText } = request.body
   const token = request.token
 
@@ -56,11 +56,11 @@ blogsRouter.post('/', async (request, response) => {
       return response.status(401).json(error.message)
     }
 
-    console.log(error)
+    next(error)
   }
 })
 
-blogsRouter.patch('/:id', async (request, response) => {
+blogsRouter.patch('/:id', async (request, response, next) => {
   try {
     const { title, author, blogText } = request.body
     const id = request.params.id
@@ -72,19 +72,19 @@ blogsRouter.patch('/:id', async (request, response) => {
     const foundBlog = await Blog.findByIdAndUpdate(id, updatedBlog, { new: true })
     response.json(foundBlog).status(200)
   } catch (error) {
-    console.log(error)
-    response.status(400).json(error)
+    next(error)
+    response.status(400).json({ error: error.message })
   }
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', async (request, response, next) => {
   try {
     const id = request.params.id
     await Blog.findByIdAndDelete(id)
     response.status(204).end()
   } catch (error) {
-    console.log(error)
-    response.status(400).json(error)
+    next(error)
+    response.status(400).json({ error: error.message })
   }
 })
 

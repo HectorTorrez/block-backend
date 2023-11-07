@@ -9,7 +9,7 @@ usersRouter.get('/', async (request, response) => {
   response.status(200).json(users)
 })
 
-usersRouter.post('/', async (request, response) => {
+usersRouter.post('/', async (request, response, next) => {
   try {
     const { name, username, password } = request.body
     const saltRounds = 10
@@ -19,8 +19,8 @@ usersRouter.post('/', async (request, response) => {
       username,
       passwordHash
     })
-
     const savedUser = await newUser.save()
+    response.status(201).json(savedUser)
 
     if (request.files === null) {
       return response.status(400).json({ error: 'Image is required' })
@@ -43,11 +43,15 @@ usersRouter.post('/', async (request, response) => {
     if (request.files.imageProfile.tempFilePath) {
       await fs.unlink(request.files.imageProfile.tempFilePath)
     }
-    response.status(400).json(error.message)
+    if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
+    }
+    next(error)
+    response.status(400).json({ error: error.message })
   }
 })
 
-usersRouter.patch('/:id', async (request, response) => {
+usersRouter.patch('/:id', async (request, response, next) => {
   try {
     const id = request.params.id
     const { name, username, password } = request.body
@@ -63,8 +67,8 @@ usersRouter.patch('/:id', async (request, response) => {
     const userFound = await User.findById(id)
     console.log(request.files)
 
-    if (request.files === null) {
-      const user = await User.findByIdAndUpdate(id, userToUpdated, { new: true })
+    if (request.files === null || request.files === undefined) {
+      const user = await User.findByIdAndUpdate(id, userToUpdated)
       return response.json(user).status(200)
     }
 
@@ -83,21 +87,20 @@ usersRouter.patch('/:id', async (request, response) => {
       await fs.unlink(imageProfile.tempFilePath)
       const user = await User.findByIdAndUpdate(id, userToUpdated, { new: true })
       return response.json(user).status(200)
-    } else {
-      return response.status(400).json({ error: 'Image is required' })
     }
   } catch (error) {
+    next(error)
     response.status(400).json(error.message)
   }
 })
 
-usersRouter.delete('/:id', async (request, response) => {
+usersRouter.delete('/:id', async (request, response, next) => {
   try {
     const id = request.params.id
     await User.findByIdAndDelete(id)
     response.status(204).end()
   } catch (error) {
-    console.log(error.message)
+    next(error)
     response.status(400).json(error.message)
   }
 })
